@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.talisol.abjadtrainer.databinding.SingleLetterBinding
 
 class LetterAdapter (
-    var letters: List<Letter>
+    var letters: MutableList<Letter>
 ): RecyclerView.Adapter<LetterAdapter.LetterViewHolder>(){
 
     inner class LetterViewHolder(val binding: SingleLetterBinding): RecyclerView.ViewHolder(binding.root)

@@ -10,7 +10,7 @@ import com.talisol.abjadtrainer.databinding.ActivityAbjadTestBinding
 import java.text.FieldPosition
 import java.util.*
 import kotlin.properties.Delegates
-
+import androidx.lifecycle.Observer
 
 class AbjadTestActivity : AppCompatActivity() {
 
@@ -20,49 +20,54 @@ class AbjadTestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbjadTestBinding.inflate(layoutInflater)
+        viewModel = ViewModelProvider(this).get(AbjadViewModel::class.java)
+
+
+        binding.recyclerView.adapter = LetterAdapter(viewModel.letterList().value!!)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this,
+            LinearLayoutManager.HORIZONTAL,false)
+
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this).get(AbjadViewModel::class.java)
-        binding.tvArabicWord.text = viewModel.currentWord().value
+        viewModel.updateValues()
+        viewModel.currentWord().observe(this, Observer {binding.tvArabicWord.text = it.toString() })
 
-        binding.btnCheckValue.setOnClickListener{
+    binding.btnCheckValue.setOnClickListener{
 
-            if (binding.itInputArabic.text.toString().isEmpty()){
-               Toast.makeText(this,"Enter a number of press DETAILS",Toast.LENGTH_SHORT).show()
-            }else{
-                if (binding.itInputArabic.text.toString().toInt() != viewModel.abjadValue().value){
-                    binding.tvWrongRight.text = "WRONG!"
-                }else{binding.tvWrongRight.text = "Correct:"}
-                binding.tvAbjadValue.text = viewModel.abjadValue().value.toString()
-            }
+        if (binding.itInputArabic.text.toString().isEmpty()){
+           Toast.makeText(this,"Enter a number of press DETAILS",Toast.LENGTH_SHORT).show()
+        }else{
+            if (binding.itInputArabic.text.toString().toInt() != viewModel.abjadValue().value){
+                binding.tvWrongRight.text = "WRONG!"
+            }else{binding.tvWrongRight.text = "Correct:"}
+            binding.tvAbjadValue.text = viewModel.abjadValue().value.toString()
         }
+    }
 
-        binding.btnNext.setOnClickListener{
-            if (viewModel.currentPosition().value != viewModel.numberWords() - 1) {
+    binding.btnNext.setOnClickListener{
+        if (viewModel.currentPosition().value != viewModel.numberWords() - 1) {
 
-                viewModel.nextQuestion()
-                binding.tvArabicWord.text = viewModel.currentWord().value
-                binding.tvAbjadValue.text = ""
-                binding.tvWrongRight.text = ""
-                binding.recyclerView.adapter = LetterAdapter(mutableListOf<Letter>())
-                binding.recyclerView.layoutManager = LinearLayoutManager(
-                    this,
-                    LinearLayoutManager.HORIZONTAL, false
-                )
+            viewModel.nextQuestion()
+            binding.tvAbjadValue.text = ""
+            binding.tvWrongRight.text = ""
+            binding.recyclerView.adapter = LetterAdapter(mutableListOf())
+            binding.recyclerView.layoutManager = LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL, false
+            )
 
-                binding.itInputArabic.getText().clear()
-            }else{
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }
+            binding.itInputArabic.text.clear()
+        }else{
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
+    }
 
-        binding.btnDetails.setOnClickListener{
-
-            binding.recyclerView.adapter = LetterAdapter(Collections.unmodifiableList((viewModel.letterList().value)))
-            binding.recyclerView.layoutManager = LinearLayoutManager(this,
-                LinearLayoutManager.HORIZONTAL,false)
-        }
+    binding.btnDetails.setOnClickListener{
+        binding.recyclerView.adapter = LetterAdapter(viewModel.letterList().value!!)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this,
+            LinearLayoutManager.HORIZONTAL,false)
+    }
 
     }
 

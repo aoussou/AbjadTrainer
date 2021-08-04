@@ -14,18 +14,24 @@ class AbjadViewModel: ViewModel() {
     private var _currentPosition = MutableLiveData<Int>(0)
     private var _currentWord = MutableLiveData<String>(_wordList[_currentPosition.value!!])
     private var _abjadValue = MutableLiveData<Int>(ExampleList.getAbjadValue(_currentWord.value!!))
-    private var _letterList = MutableLiveData< MutableList<Letter>>()
+    private var _letterList = MutableLiveData< MutableList<Letter>>(mutableListOf())
+
     fun numberWords(): Int {
         return _wordList.size
     }
 
+    fun updateValues(){
 
-    fun nextQuestion() {
-
-        _currentPosition.value = _currentPosition.value!! + 1
         _currentWord.value = _wordList[_currentPosition.value!!.toInt()]
         _abjadValue.value = ExampleList.getAbjadValue(_currentWord.value!!)
         updateletterList()
+
+
+    }
+    fun nextQuestion() {
+
+        _currentPosition.value = _currentPosition.value!! + 1
+        updateValues()
 
     }
 
@@ -58,9 +64,6 @@ class AbjadViewModel: ViewModel() {
                     ExampleList.map.get(letter.toString())!!.toString()
                 )
             )
-
-
         }
-
     }
 }
