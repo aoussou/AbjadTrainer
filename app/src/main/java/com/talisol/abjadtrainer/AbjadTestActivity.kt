@@ -7,9 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.talisol.abjadtrainer.databinding.ActivityAbjadTestBinding
-import java.text.FieldPosition
-import java.util.*
-import kotlin.properties.Delegates
 import androidx.lifecycle.Observer
 
 class AbjadTestActivity : AppCompatActivity() {
@@ -23,14 +20,29 @@ class AbjadTestActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(AbjadViewModel::class.java)
 
 
-        binding.recyclerView.adapter = LetterAdapter(viewModel.letterList().value!!)
-        binding.recyclerView.layoutManager = LinearLayoutManager(this,
-            LinearLayoutManager.HORIZONTAL,false)
+
 
         setContentView(binding.root)
 
-        viewModel.updateValues()
+        viewModel.currentValues()
         viewModel.currentWord().observe(this, Observer {binding.tvArabicWord.text = it.toString() })
+
+        viewModel.abjadValueShown().observe(this, Observer {
+
+            if (it){
+                binding.tvAbjadValue.text = viewModel.abjadValue().value.toString()
+            }
+        })
+
+        viewModel.detailsShown().observe(this, Observer {
+
+            if (it){
+                binding.recyclerView.adapter = LetterAdapter(viewModel.letterList().value!!)
+                binding.recyclerView.layoutManager = LinearLayoutManager(this,
+                    LinearLayoutManager.HORIZONTAL,false)
+            }
+        })
+
 
     binding.btnCheckValue.setOnClickListener{
 
@@ -40,7 +52,7 @@ class AbjadTestActivity : AppCompatActivity() {
             if (binding.itInputArabic.text.toString().toInt() != viewModel.abjadValue().value){
                 binding.tvWrongRight.text = "WRONG!"
             }else{binding.tvWrongRight.text = "Correct:"}
-            binding.tvAbjadValue.text = viewModel.abjadValue().value.toString()
+            viewModel.showAbjadValue()
         }
     }
 
@@ -64,6 +76,7 @@ class AbjadTestActivity : AppCompatActivity() {
     }
 
     binding.btnDetails.setOnClickListener{
+        viewModel.showDetails()
         binding.recyclerView.adapter = LetterAdapter(viewModel.letterList().value!!)
         binding.recyclerView.layoutManager = LinearLayoutManager(this,
             LinearLayoutManager.HORIZONTAL,false)
