@@ -4,64 +4,47 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.talisol.abjadtrainer.databinding.ActivityAbjadTestBinding
+import java.text.FieldPosition
+import java.util.*
+import kotlin.properties.Delegates
 
 
 class AbjadTestActivity : AppCompatActivity() {
+
+
+    lateinit var viewModel: AbjadViewModel
     private lateinit var binding: ActivityAbjadTestBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbjadTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        var submit_btn = binding.btnCheckValue
-        var word_list = ExampleList.getWordList()
-        submit_btn.text = "CHECK"
-        var next_btn = binding.btnNext
-        var details_btn = binding.btnDetails
-        var current_position = 0
 
-        var word = word_list[current_position]
-        binding.tvArabicWord.text = word
-        var totalAbjadValue = ExampleList.getAbjadValue(word)
-        var letterList = mutableListOf<Letter>()
-        var adapter = LetterAdapter(letterList)
-        var letterAbjadValue = 0
+        viewModel = ViewModelProvider(this).get(AbjadViewModel::class.java)
+        binding.tvArabicWord.text = viewModel.currentWord().value
 
-        submit_btn.setOnClickListener{
-
-
-
-
+        binding.btnCheckValue.setOnClickListener{
 
             if (binding.itInputArabic.text.toString().isEmpty()){
                Toast.makeText(this,"Enter a number of press DETAILS",Toast.LENGTH_SHORT).show()
             }else{
-                var inputNbr = binding.itInputArabic.text.toString().toInt()
-                if (inputNbr != totalAbjadValue){
+                if (binding.itInputArabic.text.toString().toInt() != viewModel.abjadValue().value){
                     binding.tvWrongRight.text = "WRONG!"
                 }else{binding.tvWrongRight.text = "Correct:"}
-                binding.tvAbjadValue.text = totalAbjadValue.toString()
+                binding.tvAbjadValue.text = viewModel.abjadValue().value.toString()
             }
-
-
-
-
         }
 
-        next_btn.setOnClickListener{
+        binding.btnNext.setOnClickListener{
+            if (viewModel.currentPosition().value != viewModel.numberWords() - 1) {
 
-            if (current_position != word_list.size-1) {
-                current_position++
-                word = word_list[current_position]
-                binding.tvArabicWord.text = word
-                totalAbjadValue = ExampleList.getAbjadValue(word)
+                viewModel.nextQuestion()
+                binding.tvArabicWord.text = viewModel.currentWord().value
                 binding.tvAbjadValue.text = ""
                 binding.tvWrongRight.text = ""
-
-                letterList = mutableListOf<Letter>()
-                adapter = LetterAdapter(letterList)
-                binding.recyclerView.adapter = adapter
+                binding.recyclerView.adapter = LetterAdapter(mutableListOf<Letter>())
                 binding.recyclerView.layoutManager = LinearLayoutManager(
                     this,
                     LinearLayoutManager.HORIZONTAL, false
@@ -69,36 +52,19 @@ class AbjadTestActivity : AppCompatActivity() {
 
                 binding.itInputArabic.getText().clear()
             }else{
-                var intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
-
-
-
-
-
         }
 
-        details_btn.setOnClickListener{
+        binding.btnDetails.setOnClickListener{
 
-            for (letter in word){
-
-                letterAbjadValue =  ExampleList.map.get(letter.toString())!!
-                letterList.add(Letter(letter.toString(),letterAbjadValue.toString()))
-            }
-
-            adapter = LetterAdapter(letterList)
-            binding.recyclerView.adapter = adapter
+            binding.recyclerView.adapter = LetterAdapter(Collections.unmodifiableList((viewModel.letterList().value)))
             binding.recyclerView.layoutManager = LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL,false)
         }
 
-
     }
 
-    fun resetToDefault(){
 
-
-    }
 }
