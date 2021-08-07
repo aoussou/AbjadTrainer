@@ -20,7 +20,9 @@ object ExampleList {
             "کلب",
             "نار",
             "شجر",
-            "برج"
+            "برج",
+            "غضنفر",
+            "ننه"
         )
 
         return wordList

@@ -17,6 +17,7 @@ class AbjadViewModel: ViewModel() {
     private var _letterList = MutableLiveData< MutableList<Letter>>(mutableListOf())
     private var _abjadValueShown = MutableLiveData<Boolean>(false)
     private var _detailsShown = MutableLiveData<Boolean>(false)
+    private var _answerRightWrong = MutableLiveData<String>("")
 
     fun numberWords(): Int {
         return _wordList.size
@@ -60,6 +61,19 @@ class AbjadViewModel: ViewModel() {
         _detailsShown.value = true
     }
 
+    fun setToRight(){
+        _answerRightWrong.value = "Correct!"
+    }
+
+    fun setToWrong(){
+        _answerRightWrong.value = "WRONG!"
+    }
+
+    fun rightOrWrong():LiveData<String>{
+        return _answerRightWrong
+    }
+
+
     fun currentPosition(): LiveData<Int> {
         return _currentPosition
     }
@@ -68,7 +82,7 @@ class AbjadViewModel: ViewModel() {
         return _letterList
     }
 
-    fun updateletterList() {
+    private fun updateletterList() {
 
         _letterList.value = mutableListOf<Letter>()
 

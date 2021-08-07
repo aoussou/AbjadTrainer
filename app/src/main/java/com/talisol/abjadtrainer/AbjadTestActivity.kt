@@ -11,21 +11,18 @@ import androidx.lifecycle.Observer
 
 class AbjadTestActivity : AppCompatActivity() {
 
-
     lateinit var viewModel: AbjadViewModel
     private lateinit var binding: ActivityAbjadTestBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAbjadTestBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this).get(AbjadViewModel::class.java)
-
-
-
-
         setContentView(binding.root)
 
         viewModel.currentValues()
         viewModel.currentWord().observe(this, Observer {binding.tvArabicWord.text = it.toString() })
+
+        viewModel.rightOrWrong().observe(this, Observer {binding.tvWrongRight.text = it.toString() })
 
         viewModel.abjadValueShown().observe(this, Observer {
 
@@ -50,8 +47,8 @@ class AbjadTestActivity : AppCompatActivity() {
            Toast.makeText(this,"Enter a number of press DETAILS",Toast.LENGTH_SHORT).show()
         }else{
             if (binding.itInputArabic.text.toString().toInt() != viewModel.abjadValue().value){
-                binding.tvWrongRight.text = "WRONG!"
-            }else{binding.tvWrongRight.text = "Correct:"}
+                viewModel.setToWrong()
+            }else{viewModel.setToRight()}
             viewModel.showAbjadValue()
         }
     }
